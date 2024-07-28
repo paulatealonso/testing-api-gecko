@@ -1,48 +1,60 @@
 import requests
 import json
-import os
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Base URL of the GeckoTerminal API
+base_url = "https://api.geckoterminal.com/api/v2/networks/ton/tokens"
 
-# Get the API key from the environment variable
-api_key = os.getenv('COINGECKO_API_KEY')
+# Function to get detailed token information from GeckoTerminal by contract address
+def get_detailed_token_info(contract_address):
+    url = f"{base_url}/{contract_address}/info"
+    headers = {
+        'Accept': 'application/json'
+    }
+    print(f"Fetching data from URL: {url}")
+    response = requests.get(url, headers=headers)
+    print(f"Response status code: {response.status_code}")
+    if response.status_code == 200:
+        data = response.json()
+        token_data = data.get('data', {}).get('attributes', {})
+        if token_data:
+            print(f"Token Address: {contract_address}")
+            print(f"Name: {token_data.get('name', 'No data available')}")
+            print(f"Symbol: {token_data.get('symbol', 'No data available')}")
+        else:
+            print("No token data found for the given contract address.")
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
 
-# URL of the endpoint to get token information
-url = "https://api.coingecko.com/api/v3/coins/markets"
+# Function to get token price and liquidity info from GeckoTerminal pools
+def get_token_pool_info(contract_address):
+    pool_url = f"https://api.geckoterminal.com/api/v2/networks/ton/tokens/{contract_address}/pools"
+    headers = {
+        'Accept': 'application/json'
+    }
+    print(f"Fetching pool data from URL: {pool_url}")
+    response = requests.get(pool_url, headers=headers)
+    print(f"Response status code: {response.status_code}")
+    if response.status_code == 200:
+        data = response.json()
+        pools = data.get('data', [])
+        for pool in pools:
+            attributes = pool.get('attributes', {})
+            print(f"\nPool ID: {pool.get('id')}")
+            print(f"Token 0: {attributes.get('token_0_name')} ({attributes.get('token_0_symbol')})")
+            print(f"Token 1: {attributes.get('token_1_name')} ({attributes.get('token_1_symbol')})")
+            print(f"Price (USD): {attributes.get('base_token_price_usd', 'No data available')}")
+            print(f"Liquidity (USD): {attributes.get('reserve_in_usd', 'No data available')}")
+            print(f"Volume 24h (USD): {attributes.get('volume_usd', {}).get('h24', 'No data available')}")
+            print(f"Market Cap: {attributes.get('market_cap_usd', 'No data available')}")
+            print(f"Total Supply: {attributes.get('total_supply', 'No data available')}")
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
 
-# Parameters for the request
-params = {
-    'vs_currency': 'usd',
-    'ids': 'the-open-network'
-}
+# Example usage
+print("Information for Lady Pink:")
+get_detailed_token_info('EQApjmLolkKzsporbp-Xtdur_lgxin-0A3GwSMcQ91LBe7rs')
 
-# Headers for the request
-headers = {
-    'Accept': 'application/json',
-    'X-Cg-Pro-Api-Key': api_key
-}
-
-# Make the GET request
-response = requests.get(url, params=params, headers=headers)
-
-# Check the HTTP status code
-if response.status_code == 200:
-    # Print the response in JSON format
-    data = response.json()
-    for token in data:
-        print(f"ID: {token['id']}")
-        print(f"Symbol: {token['symbol']}")
-        print(f"Name: {token['name']}")
-        print(f"Current Price: ${token['current_price']}")
-        print(f"Market Cap: ${token['market_cap']}")
-        print(f"Market Cap Rank: {token['market_cap_rank']}")
-        print(f"Total Volume: ${token['total_volume']}")
-        print(f"24h High: ${token['high_24h']}")
-        print(f"24h Low: ${token['low_24h']}")
-        print(f"24h Price Change: {token['price_change_percentage_24h']}%")
-        print(f"Last Updated: {token['last_updated']}")
-        print(f"Image: {token['image']}")
-else:
-    print(f"Error: {response.status_code}")
+print("\nFetching pool information for Lady Pink:")
+get_token_pool_info('EQApjmLolkKzsporbp-Xtdur_lgxin-0A3GwSMcQ91LBe7rs')
