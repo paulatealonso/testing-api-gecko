@@ -39,9 +39,14 @@ def get_token_pool_info(contract_address):
     else:
         print("Error fetching pool data")
 
-# Example usage
-print("Information for Lady Pink:")
-get_detailed_token_info('EQApjmLolkKzsporbp-Xtdur_lgxin-0A3GwSMcQ91LBe7rs')
+# Main function to execute the script
+def main():
+    contract_address = input("Please enter the contract address: ")
+    print(f"\nInformation for token with contract address {contract_address}:")
+    get_detailed_token_info(contract_address)
+    print("\nFetching pool information:")
+    get_token_pool_info(contract_address)
 
-print("\nFetching pool information for Lady Pink:")
-get_token_pool_info('EQApjmLolkKzsporbp-Xtdur_lgxin-0A3GwSMcQ91LBe7rs')
+# Execute the main function
+if __name__ == "__main__":
+    main()
