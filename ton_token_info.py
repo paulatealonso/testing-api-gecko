@@ -26,7 +26,7 @@ def get_detailed_token_info(contract_address):
         print(f"Error: {response.status_code}")
         print(response.text)
 
-# Function to get token price and liquidity info from GeckoTerminal pools
+# Function to get token price, liquidity, FDV, volume, and holders info from GeckoTerminal pools
 def get_token_pool_info(contract_address):
     pool_url = f"https://api.geckoterminal.com/api/v2/networks/ton/tokens/{contract_address}/pools"
     headers = {
@@ -46,8 +46,8 @@ def get_token_pool_info(contract_address):
             print(f"Price (USD): {attributes.get('base_token_price_usd', 'No data available')}")
             print(f"Liquidity (USD): {attributes.get('reserve_in_usd', 'No data available')}")
             print(f"Volume 24h (USD): {attributes.get('volume_usd', {}).get('h24', 'No data available')}")
-            print(f"Market Cap: {attributes.get('market_cap_usd', 'No data available')}")
-            print(f"Total Supply: {attributes.get('total_supply', 'No data available')}")
+            print(f"FDV (Fully Diluted Valuation): {attributes.get('fdv_usd', 'No data available')}")
+            print(f"Holders: {attributes.get('holders', 'No data available')}")
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
